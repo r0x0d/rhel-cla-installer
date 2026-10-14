@@ -20,7 +20,7 @@ COPY collections/ansible_collections/rhel \
 
 COPY scripts/build-zipapp.py /opt/setup/
 
-RUN python3 /opt/setup/build-zipapp.py
+RUN /opt/setup/build-zipapp.py
 
 
 FROM registry.access.redhat.com/ubi10-minimal:10.2-1791784796
