@@ -14,11 +14,23 @@ COPY requirements/*.txt      /opt/setup/
 # dependency store (PIP_FIND_LINKS/PIP_NO_INDEX).
 COPY requirements/requirements.yml /opt/setup/requirements.yml
 
-# Add the local rhel namespace alongside the downloaded collections.
+# Add the local rhel namespace alongside the galaxy collections.
 COPY collections/ansible_collections/rhel \
      /opt/setup/collections/ansible_collections/rhel
 
-COPY scripts/build-zipapp.py /opt/setup/
+COPY scripts/build-zipapp.py scripts/install-toolchain.sh /opt/setup/
+
+# Build from source by default (Product Security requirement for Konflux):
+# every wheel is compiled inside the build instead of using prebuilt
+# manylinux wheels. Override with --build-arg BUILD_FROM_SOURCE=0 for fast
+# local builds from prebuilt wheels (not available in hermetic builds,
+# which prefetch source distributions only).
+ARG BUILD_FROM_SOURCE=1
+ENV BUILD_FROM_SOURCE=${BUILD_FROM_SOURCE}
+
+# C/Rust toolchain for compiling the wheels (no-op when BUILD_FROM_SOURCE=0).
+# Hermetic builds install the RPMs Hermeto prefetched
+RUN /opt/setup/install-toolchain.sh
 
 RUN /opt/setup/build-zipapp.py
 
@@ -27,6 +39,7 @@ FROM registry.access.redhat.com/ubi10-minimal:10.2-1791784796
 
 ARG VERSION=2.0.0
 
+# Need tar in the final image to perm the extraction of the installer ziapp.
 RUN microdnf install tar -y --nodocs --setopt install_weak_deps=0 && \
     microdnf clean all && \
     rm -rf /var/cache/dnf

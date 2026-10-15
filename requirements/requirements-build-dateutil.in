@@ -1,0 +1,11 @@
+# python-dateutil (a kubernetes dependency) pins setuptools_scm<8.0 in its
+# build-system.requires, while urllib3 and hatch-vcs need setuptools-scm>=8.
+# A single flat build file cannot carry both versions, but pip resolves each
+# sdist's build environment independently against the prefetched store, so
+# Hermeto fetches this legacy pin as a separate build file and both versions
+# coexist in the store.
+#
+# Kept dependency-free (--no-deps): setuptools-scm 7.x runtime dependencies
+# (packaging) are already provided by requirements-build.txt.
+
+setuptools-scm<8

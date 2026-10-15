@@ -84,6 +84,45 @@ run: ansible-operator ## Run against the configured Kubernetes cluster in ~/.kub
 docker-build: ## Build docker image with the manager.
 	docker build -t ${IMG} .
 
+.PHONY: galaxy-lockfile
+galaxy-lockfile: ## Regenerate requirements/artifacts.lock.yaml (requires network access to galaxy.ansible.com).
+	python3 scripts/galaxy-lockfile.py
+
+.PHONY: build-deps
+build-deps: ## Regenerate the requirements files from uv.lock (requires uv and network access to pypi.org).
+	python3 scripts/build-deps.py
+
+.PHONY: freeze
+freeze: ## Upgrade uv.lock and regenerate the requirements files (requires uv and network access to pypi.org).
+	uv lock --upgrade
+	python3 scripts/build-deps.py
+
+RLP_VERSION = 0.30.1
+RLP_IMAGE ?= rpm-lockfile-prototype:$(RLP_VERSION)
+.PHONY: rpm-lockfile-prototype-image
+rpm-lockfile-prototype-image: ## Build the containerized rpm-lockfile-prototype (requires podman).
+	curl -s https://raw.githubusercontent.com/konflux-ci/rpm-lockfile-prototype/refs/tags/v$(RLP_VERSION)/Containerfile | \
+		podman build -t localhost/$(RLP_IMAGE) -
+
+.PHONY: rpm-lock
+rpm-lock: rpm-lockfile-prototype-image ## Regenerate requirements/rpms.lock.yaml (requires podman and network access).
+	podman run --rm -v "$(shell pwd):/work:z" -w /work $(RLP_IMAGE) requirements/rpms.in.yaml --outfile requirements/rpms.lock.yaml
+
+# Run Hermeto locally with the same input the Konflux pipeline uses, to
+# validate the prefetch (pip sdists + build deps, the RPM lockfile and the
+# galaxy collections). Requires podman; output lands in .hermeto-out/.
+HERMETO_IMAGE ?= quay.io/konflux-ci/hermeto:0.62.0
+HERMETO_PREFETCH_INPUT = '[{"type": "pip", "path": "requirements", "requirements_files": ["requirements-3.12.txt", "requirements-tools-3.12.txt"], "requirements_build_files": ["requirements-build.txt", "requirements-build-pypi.txt", "requirements-build-dateutil.txt"]}, {"type": "rpm", "path": "requirements"}, {"type": "generic", "path": "requirements"}]'
+.PHONY: hermeto-prefetch
+hermeto-prefetch:
+	rm -rf .hermeto-out
+	podman run --rm -v "$(shell pwd):$(shell pwd):z" -w "$(shell pwd)" $(HERMETO_IMAGE) fetch-deps \
+		--source . --output ./.hermeto-out $(HERMETO_PREFETCH_INPUT)
+	podman run --rm -v "$(shell pwd):$(shell pwd):z" -w "$(shell pwd)" $(HERMETO_IMAGE) generate-env \
+		./.hermeto-out -o ./.hermeto-out/cachi2.env --for-output-dir /cachi2/output
+	podman run --rm -v "$(shell pwd):$(shell pwd):z" -w "$(shell pwd)" $(HERMETO_IMAGE) inject-files \
+		./.hermeto-out --for-output-dir /cachi2/output
+
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
 	docker push ${IMG}

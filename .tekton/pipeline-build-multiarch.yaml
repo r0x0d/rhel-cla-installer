@@ -46,15 +46,41 @@ spec:
       type: string
       default: "false"
 
+    # Run the container build without network access. All dependencies are
+    # prefetched by the prefetch-dependencies task (Hermeto).
+    # See below `prefetch-input` for location and tasks.
     - name: hermetic
       description: Execute the build with network isolation
       type: string
-      default: "false"
+      default: "true"
 
     - name: prefetch-input
       description: Build dependencies to be prefetched by Cachi2
       type: string
-      default: ""
+      default: >-
+        [
+          {
+            "type": "pip",
+            "path": "requirements",
+            "requirements_files": [
+              "requirements-3.12.txt",
+              "requirements-tools-3.12.txt"
+            ],
+            "requirements_build_files": [
+              "requirements-build.txt",
+              "requirements-build-pypi.txt",
+              "requirements-build-dateutil.txt"
+            ]
+          },
+          {
+            "type": "rpm",
+            "path": "requirements"
+          },
+          {
+            "type": "generic",
+            "path": "requirements"
+          }
+        ]
 
     - name: image-expires-after
       description: Image tag expiration time, time values could be something like 1h, 2d, 3w for hours, days, and weeks, respectively.

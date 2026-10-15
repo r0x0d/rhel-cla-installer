@@ -1,0 +1,16 @@
+[project]
+# Virtual project: never built or installed itself — it exists so uv can lock
+# and export the installer's Python dependencies (see scripts/build-deps.py).
+name = "rhel-cla-installer"
+version = "2.0.0"
+description = "RHEL Command Line Assistant installer"
+requires-python = ">=3.12"
+dependencies = [
+    "ansible-core<2.19",
+    "kubernetes",
+]
+
+[dependency-groups]
+# Build tooling for the zipapp, installed into its own venv by
+# scripts/build-zipapp.py.
+tools = ["shiv"]

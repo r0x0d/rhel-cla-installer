@@ -1,5 +1,9 @@
 .crush/
+__pycache__/
 .python-version
+.venv/
+.venvs/
+.hermeto-out/
 
 /local
 /roles/

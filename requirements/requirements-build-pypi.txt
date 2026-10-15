@@ -1,0 +1,5 @@
+--index-url https://pypi.org/simple/
+
+vcs-versioning==2.6.0 \
+    --hash=sha256:22e9159288e2d8bca2fa6f6c31c34c9c66aec157f60e9e526f5d160d2516d60f \
+    --hash=sha256:f8bebd1302ebc12e67ceb30fc7dd698ec969414b6fa43b30c3f14ac9b1e72c41

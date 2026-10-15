@@ -1,1 +1,35 @@
-shiv
+# PEP 517 build backends for the packages the hermetic Konflux build compiles
+# from source (see BUILD_FROM_SOURCE in the Containerfile). Hermeto prefetches
+# the compiled requirements-build.txt and pip installs these backends into each
+# sdist's isolated build environment from the prefetched store.
+#
+# This list cannot be generated from uv.lock: the backends are the
+# build-system.requires of the dependencies' sdists (and of the backends' own
+# runtime dependencies, recursively), not of this project, so they must be
+# maintained here by hand.
+#
+# pip resolves every sdist's build-system.requires against that store, so each
+# version pinned here must satisfy the constraints of ALL its consumers. The
+# bounds below encode those intersections; when adding or upgrading a
+# dependency, check its sdist's pyproject.toml [build-system] and adjust.
+#
+# Packages missing from the Konflux package registry proxy must be pinned in
+# requirements-build-pypi.in instead (Hermeto scopes --index-url per file).
+# python-dateutil's legacy setuptools-scm pin lives in
+# requirements-build-dateutil.in.
+
+calver                         # trove-classifiers
+cffi                           # cryptography (>=2.0.0)
+cython                         # pyyaml
+expandvars                     # frozenlist, propcache, yarl
+flit-core>=3.12,<4             # jinja2 (<4), idna (>=3.11,<5), packaging (>=3.12), click/pip/typing-extensions/wheel (>=3.11,<4)
+hatch-fancy-pypi-readme        # attrs (>=23.2.0), pydantic (>=22.5.0)
+hatch-vcs>=0.4,<0.6            # urllib3, attrs
+hatchling>=1.27,<2             # urllib3 (>=1.27,<2), typing-inspection, annotated-types, pydantic, attrs, expandvars
+maturin>=1.15,<2               # pydantic-core (>=1.15,<2), cryptography (>=1.14.1,<2)
+pkgconfig                      # aiohttp
+poetry-core>=2.0               # aiohappyeyeballs (>=2.0.0), pkgconfig (>=1.0.0), tomlkit (>=1.0.0a9)
+setuptools<=84.0.0             # ansible-core (>=66.1.0,<=84.0.0), charset-normalizer (<84.1), cffi/aiohttp/markupsafe (>=77)
+setuptools-rust>=1.11          # maturin
+setuptools-scm>=8,<11          # urllib3 (>=8,<11), hatch-vcs, pluggy (setuptools-scm[toml]>=8)
+wheel==0.45.1                  # ansible-core (exact pin)

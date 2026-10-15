@@ -1,0 +1,13 @@
+# Build backends missing from the Konflux package registry proxy, fetched
+# from PyPI directly instead (Hermeto scopes --index-url per file, hence the
+# split from requirements-build.in). Hermeto cannot fetch them through the
+# proxy and the build would fail with a 404 during prefetch.
+#
+# Kept dependency-free (--no-deps in scripts/build-deps.py): their runtime
+# dependencies are resolved by requirements-build.in where possible.
+#
+# When a prefetch fails in Konflux with a 404 or "no distributions found" for
+# a package listed in requirements-build.txt, move that package here.
+
+# Runtime dependency of setuptools-scm>=10; not carried by the proxy.
+vcs-versioning
