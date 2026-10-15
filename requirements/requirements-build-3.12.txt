@@ -1,3 +1,0 @@
-click==8.5.0
-setuptools==84.0.0
-shiv==1.0.8

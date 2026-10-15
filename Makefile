@@ -231,3 +231,7 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+.PHONY: build-deps
+build-deps: ## Regenerate the hash-pinned pip requirements in .konflux/pip/ (requires python3.12 and network access).
+	python3 scripts/build-deps.py

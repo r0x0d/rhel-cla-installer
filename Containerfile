@@ -9,19 +9,7 @@ FROM registry.access.redhat.com/hi/python:3.12-builder AS builder
 
 USER 0
 
-# Install ansible-core so ansible-galaxy is available. The upper bound matches
-# requirements.in; the exact version is frozen in requirements-3.12.txt.
-COPY requirements/*.txt      /opt/setup/
-RUN pip3 install --no-cache-dir -r /opt/setup/requirements-3.12.txt
-
-# Download galaxy collections — ansible-galaxy writes to
-COPY requirements/requirements.yml /opt/setup/requirements.yml
-RUN ansible-galaxy collection install -r /opt/setup/requirements.yml -p /opt/setup/collections
-
-# Add the local rhel namespace alongside the downloaded collections.
-COPY collections/ansible_collections/rhel \
-     /opt/setup/collections/ansible_collections/rhel
-
+COPY .konflux/pip/*.txt /opt/setup/
 COPY scripts/build-zipapp.py /opt/setup/
 
 RUN /opt/setup/build-zipapp.py
