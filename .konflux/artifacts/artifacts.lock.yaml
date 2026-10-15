@@ -1,0 +1,22 @@
+---
+# Managed by scripts/artifacts-lock.py -- do not edit by hand.
+# Regenerate after changing requirements/requirements.yml:
+#   make artifacts-lock
+metadata:
+  version: '1.0'
+artifacts:
+  - download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/cloud-common-5.0.0.tar.gz
+    checksum: sha256:7ca18bdabdeba778ebdc6233abbad2e2ac130ec351b3773a5d87ae199de23124
+    filename: cloud-common-5.0.0.tar.gz
+  - download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/community-docker-5.2.1.tar.gz
+    checksum: sha256:2f0b8d3c0fe3d774357907a1dd43743a1297e8086d843f19b3e9e931917ab548
+    filename: community-docker-5.2.1.tar.gz
+  - download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/community-library_inventory_filtering_v1-1.1.5.tar.gz
+    checksum: sha256:cbb9e86c5b1720df21e940cedcd2f3e1226c38262623e090a883712610733851
+    filename: community-library_inventory_filtering_v1-1.1.5.tar.gz
+  - download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/kubernetes-core-5.4.4.tar.gz
+    checksum: sha256:8c26aea22ecebae67a4a85d9edb5883dcd884ca7a164209bd5b442e9f3576160
+    filename: kubernetes-core-5.4.4.tar.gz
+  - download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/operator_sdk-util-0.5.0.tar.gz
+    checksum: sha256:92fe28e6d6bd39cec11ed6e056cffe77e6dbcc172b65179717cb32534117790f
+    filename: operator_sdk-util-0.5.0.tar.gz

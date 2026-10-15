@@ -242,3 +242,7 @@ rpm-lockfile-prototype-image: ## Build the containerized rpm-lockfile-prototype 
 .PHONY: rpm-lock
 rpm-lock: _rpm-lockfile-prototype-image ## Regenerate .konflux/rpms/rpms.lock.yaml (requires podman and network access).
 	podman run --rm -v "$(shell pwd):/work:z" -w /work $(RLP_IMAGE) .konflux/rpms/rpms.in.yaml --outfile .konflux/rpms/rpms.lock.yaml
+
+.PHONY: artifacts-lock
+artifacts-lock: ## Regenerate .konflux/artifacts/artifacts.lock.yaml (requires network access to galaxy.ansible.com).
+	python3 scripts/artifacts-lock.py
