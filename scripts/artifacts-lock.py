@@ -24,8 +24,9 @@ import sys
 import tarfile
 import tempfile
 
-from io import StringIO
+from functools import partial
 from pathlib import Path
+from typing import IO
 
 from ruamel.yaml import YAML
 
@@ -41,14 +42,12 @@ def sha256sum(path: Path) -> str:
     """Hex sha256 of a file, read in chunks to bound memory use."""
 
     digest = hashlib.sha256()
-    # Local variable improves performance by reducing lookups
-    digest_update = digest.update
     # Align the chunks with the hash function block size.
-    block_size = (1024 * 1024) // digest.block_size * digest.block_size.
+    block_size = (1024 * 1024) // digest.block_size * digest.block_size
     with path.open("rb") as file:
-        for chunk in iter(partial(f.read, block_size), b""):
-            digest_update(chunk)
-            
+        for chunk in iter(partial(file.read, block_size), b""):
+            digest.update(chunk)
+
     return digest.hexdigest()
 
 
@@ -57,7 +56,11 @@ def artifact_entry(tarball: Path) -> dict:
 
     with tarfile.open(tarball) as archive:
         info = json.load(archive.extractfile("MANIFEST.json"))["collection_info"]
-    filename = f"{info['namespace']}-{info['name']}-{info['version']}.tar.gz"
+
+    namespace = info["namespace"]
+    name = info["name"]
+    version = info["version"]
+    filename = f"{namespace}-{name}-{version}.tar.gz"
     return {
         "download_url": f"{GALAXY_ARTIFACTS_URL}/{filename}",
         "checksum": f"sha256:{sha256sum(tarball)}",
@@ -82,41 +85,38 @@ def download_tarballs(destination: Path) -> list[Path]:
         result = subprocess.run(command)
     except FileNotFoundError:
         sys.exit("ansible-galaxy not found on PATH; install ansible-core")
+        
     if result.returncode != 0:
         sys.exit(f"ansible-galaxy exited with {result.returncode}")
 
     tarballs = sorted(destination.glob("*.tar.gz"))
     if not tarballs:
         sys.exit("ansible-galaxy did not download any collections")
+
     return tarballs
-
-
-def dump_lockfile(entries: list[dict]) -> str:
-    """Render the lockfile contents below the header comments."""
-
-    yaml = YAML()
-    yaml.indent(mapping=2, sequence=4, offset=2)  # sequences indented under their key
-    yaml.width = 4096  # keep the long galaxy URLs on one line
-    stream = StringIO()
-    yaml.dump({"metadata": {"version": "1.0"}, "artifacts": entries}, stream)
-    return stream.getvalue()
 
 
 def generate_lockfile() -> None:
     if not REQUIREMENTS_FILE.is_file():
-        raise SystemExit(f"Missing {REQUIREMENTS_FILE}")
+        sys.exit(f"Missing {REQUIREMENTS_FILE}")
 
     print(f"Resolving {REQUIREMENTS_FILE.relative_to(REPO_ROOT)} with ansible-galaxy...")
     with tempfile.TemporaryDirectory() as destination:
         # Read and hash inside the context: the tarballs vanish with it.
         entries = [artifact_entry(tarball) for tarball in download_tarballs(Path(destination))]
 
-    LOCKFILE.write_text(
-        "---\n"
-        "# Managed by scripts/artifacts-lock.py -- do not edit by hand.\n"
-        "# Regenerate after changing requirements/requirements.yml:\n"
-        "#   make artifacts-lock\n" + dump_lockfile(entries)
-    )
+    yaml = YAML()
+    yaml.indent(mapping=2, sequence=4, offset=2)  # sequences indented under their key
+    yaml.width = 4096  # keep the long galaxy URLs on one line
+    with LOCKFILE.open("w") as file:
+        file.write(
+            "---\n"
+            "# Managed by scripts/artifacts-lock.py -- do not edit by hand.\n"
+            "# Regenerate after changing requirements/requirements.yml:\n"
+            "#   make artifacts-lock\n"
+        )
+        yaml.dump({"metadata": {"version": "1.0"}, "artifacts": entries}, file)
+
     print(f"Wrote {LOCKFILE.relative_to(REPO_ROOT)} ({len(entries)} artifacts)")
 
 
