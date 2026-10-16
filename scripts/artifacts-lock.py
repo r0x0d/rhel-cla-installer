@@ -41,9 +41,14 @@ def sha256sum(path: Path) -> str:
     """Hex sha256 of a file, read in chunks to bound memory use."""
 
     digest = hashlib.sha256()
+    # Local variable improves performance by reducing lookups
+    digest_update = digest.update
+    # Align the chunks with the hash function block size.
+    block_size = (1024 * 1024) // digest.block_size * digest.block_size.
     with path.open("rb") as file:
-        for chunk in iter(lambda: file.read(1 << 20), b""):
-            digest.update(chunk)
+        for chunk in iter(partial(f.read, block_size), b""):
+            digest_update(chunk)
+            
     return digest.hexdigest()
 
 
