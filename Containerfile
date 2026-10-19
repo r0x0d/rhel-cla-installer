@@ -40,7 +40,7 @@ USER 65532
 WORKDIR /opt/ansible
 
 COPY ansible.cfg ansible.cfg
-COPY inventory/hosts.example.yml ${HOME}/inventory/hosts.yml
+COPY inventory/hosts.example.yml inventory/hosts.yml
 COPY collections/ansible_collections/rhel collections/ansible_collections/rhel
 COPY --from=builder /opt/rhel-cla-installer rhel-cla-installer
 
