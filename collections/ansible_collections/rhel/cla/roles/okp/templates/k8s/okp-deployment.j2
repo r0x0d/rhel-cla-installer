@@ -55,8 +55,8 @@ spec:
             - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ okp_access_key.name }}
-                  key: {{ okp_access_key.key }}
+                  name: {{ okp_access_key_secret.name }}
+                  key: {{ okp_access_key_secret.key }}
 
             - name: SOLR_HOST_BIND
               value: {{ okp_solr_host_bind }}

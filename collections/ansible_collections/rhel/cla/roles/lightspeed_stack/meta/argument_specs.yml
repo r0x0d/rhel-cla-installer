@@ -1,0 +1,47 @@
+argument_specs:
+  main: &spec
+    options:
+      rhel_cla_provider:
+        type: str
+        required: yes
+        choices:
+          - vertex
+          - ramalama
+
+      ramalama_config:
+        type: dict
+        required: "{{ rhel_cla_provider == 'ramalama' }}"
+        options:
+          api_key:
+            type: str
+            required: yes
+
+          base_url:
+            type: str
+            required: yes
+
+          default_model:
+            type: str
+            required: yes
+
+      vertex_config:
+        type: dict
+        required: "{{ rhel_cla_provider == 'vertex' }}"
+        options:
+          credentials_secret_name:
+            type: str
+            required: yes
+
+          default_model:
+            type: str
+
+          location:
+            type: str
+            required: yes
+
+          project_id:
+            type: str
+            required: yes
+
+
+  k8s: *spec

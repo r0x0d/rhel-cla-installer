@@ -1,0 +1,20 @@
+argument_specs:
+  main: &spec
+    options:
+      cla_pod_name:
+        type: str
+        required: yes
+
+      cla_port:
+        type: int
+        required: yes
+
+      cla_publish_port:
+        type: str
+        required: yes
+
+      ls_port:
+        type: int
+        required: yes
+
+  remove: *spec

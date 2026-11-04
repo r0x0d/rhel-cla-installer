@@ -11,3 +11,6 @@ okp_memory_request: 2Gi
 okp_memory_limit: 4Gi
 okp_solr_log_level: INFO
 okp_access_key: ~
+okp_access_key_secret:
+  name: okp
+  key: access_key

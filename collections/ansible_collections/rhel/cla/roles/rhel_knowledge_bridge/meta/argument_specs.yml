@@ -1,0 +1,12 @@
+argument_specs:
+  main: &spec
+    options:
+      okp_name:
+        type: str
+        required: yes
+
+      okp_port:
+        type: int
+        required: yes
+
+  k8s: *spec

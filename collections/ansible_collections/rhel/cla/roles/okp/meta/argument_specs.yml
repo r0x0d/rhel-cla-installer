@@ -1,0 +1,20 @@
+argument_specs:
+  main:
+    options:
+      okp_access_key:
+        type: str
+        required: yes
+
+  k8s:
+    options:
+      okp_access_key_secret:
+        type: dict
+        required: yes
+        options:
+          name:
+            type: str
+            required: yes
+
+          key:
+            type: str
+            required: yes
