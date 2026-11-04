@@ -53,6 +53,8 @@ sudo podman secret create [secret name] [path to file]
 
 Set the secret name, project_id, and location in the inventory variables.
 
+**Note**: Model names must match the Goode SDK-native format exactly for model registration to succeed. For Vertex AI, the SDK returns the full resource-name format such as `publishers/google/models/gemini-2.5-flash`.
+
 ```yaml
 vertex_config:
   default_model: publishers/google/models/gemini-2.5-flash

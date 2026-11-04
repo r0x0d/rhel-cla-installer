@@ -1,0 +1,215 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+labels:
+  template: "${NAME}"
+
+metadata:
+  name: "${NAME}"
+  annotations:
+    openshift.io/display-name: Red Hat Offline Knowledge Portal
+    tags: solr,rhel,documentation
+    description: >-
+      Deploys the Red Hat Offline Knowledge Portal (OKP) with a Solr-based
+      documentation index for RHEL Lightspeed RAG queries.
+
+objects:
+  # ====== ConfigMap: tar wrapper ====== #
+  # Workaround for the rhokp-rhel9 container image calling tar without
+  # --no-same-owner / --no-same-permissions. Under restricted-v2 SCC the
+  # random UID cannot utime or set the setgid bit, causing a CrashLoop.
+  # This wrapper sits at /usr/local/bin/tar (before /usr/bin/tar in PATH)
+  # and injects the missing flags.
+  # Upstream fix: https://redhat.atlassian.net/browse/RHOKP-1128
+  # Remove this ConfigMap and its volume/volumeMount once the fix ships.
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: "${NAME}-tar-wrapper"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+    data:
+      tar: |
+        #!/bin/bash
+        echo "tar-wrapper: called with args: $*" >&2
+        /usr/bin/tar --no-same-owner --no-same-permissions --no-overwrite-dir --touch "$@" 2>&1 | grep -v 'Cannot change mode\|Cannot utime' >&2
+        exit 0
+
+  # ====== ServiceAccount ====== #
+  - kind: ServiceAccount
+    apiVersion: v1
+    metadata:
+      name: "${NAME}"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+  # ====== Deployment ====== #
+  - kind: Deployment
+    apiVersion: apps/v1
+    metadata:
+      name: "${NAME}"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+    spec:
+      replicas: "${{REPLICAS}}"
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+
+      selector:
+        matchLabels:
+          app: "${NAME}"
+
+      template:
+        metadata:
+          annotations:
+            configmap-hash: "tar-wrapper-v5"
+
+          labels:
+            service: rhel-cla
+            app: "${NAME}"
+
+        spec:
+          serviceAccountName: "${NAME}"
+          volumes:
+            - name: solr-data
+              emptyDir: {}
+
+            - name: tar-wrapper
+              configMap:
+                name: "${NAME}-tar-wrapper"
+                defaultMode: 0755
+
+          containers:
+            - name: "${NAME}"
+              image: "${IMAGE}:${IMAGE_TAG}"
+              ports:
+                - containerPort: 8983
+                  protocol: TCP
+
+              volumeMounts:
+                - name: solr-data
+                  mountPath: /opt/solr/server/solr/portal/data
+
+                - name: tar-wrapper
+                  mountPath: /usr/local/bin/tar
+                  subPath: tar
+
+              env:
+                - name: ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: okp
+                      key: access_key
+
+                - name: SOLR_JETTY_HOST
+                  value: "0.0.0.0"
+
+                - name: SOLR_LOG_LEVEL
+                  value: "${SOLR_LOG_LEVEL}"
+
+              startupProbe:
+                initialDelaySeconds: 10
+                periodSeconds: 10
+                failureThreshold: 18
+                tcpSocket:
+                  port: 8983
+
+              livenessProbe:
+                periodSeconds: 10
+                failureThreshold: 3
+                tcpSocket:
+                  port: 8983
+
+              readinessProbe:
+                periodSeconds: 10
+                failureThreshold: 3
+                tcpSocket:
+                  port: 8983
+
+              resources:
+                requests:
+                  cpu: "${CPU_REQUEST}"
+                  memory: "${MEMORY_REQUEST}"
+
+                limits:
+                  cpu: "${CPU_LIMIT}"
+                  memory: "${MEMORY_LIMIT}"
+
+  # ====== Service (Solr only) ====== #
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: "${NAME}"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+    spec:
+      sessionAffinity: ClientIP
+      ports:
+        - port: 8983
+          protocol: TCP
+          targetPort: 8983
+
+      selector:
+        app: "${NAME}"
+
+parameters:
+  - name: NAME
+    displayName: Application Name
+    description: The name assigned to all objects in the template.
+    value: redhat-okp
+    required: true
+
+  - name: IMAGE
+    displayName: Container Image
+    description: The container image to deploy.
+    value: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9
+    required: true
+
+  - name: IMAGE_TAG
+    displayName: Image Tag
+    description: The tag of the container image.
+    value: latest
+    required: true
+
+  - name: REPLICAS
+    displayName: Replicas
+    description: Number of replicas to deploy.
+    value: "1"
+    required: true
+
+  - name: CPU_REQUEST
+    displayName: CPU Request
+    description: CPU request per pod.
+    value: "1"
+
+  - name: CPU_LIMIT
+    displayName: CPU Limit
+    description: CPU limit per pod.
+    value: "2"
+
+  - name: MEMORY_REQUEST
+    displayName: Memory Request
+    description: Memory request per pod.
+    value: 2Gi
+
+  - name: MEMORY_LIMIT
+    displayName: Memory Limit
+    description: Memory limit per pod.
+    value: 4Gi
+
+  - name: SOLR_LOG_LEVEL
+    displayName: Solr Log Level
+    description: >-
+      Log level for the Solr instance. Valid values: FINEST, FINE,
+      CONFIG, INFO, WARNING, SEVERE, OFF.
+    value: INFO

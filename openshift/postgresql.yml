@@ -1,0 +1,107 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+labels:
+  template: "${NAME}"
+
+metadata:
+  name: "${NAME}"
+
+objects:
+  # ====== Service ====== #
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: "${NAME}"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+    spec:
+      selector:
+        app: "${NAME}"
+
+      ports:
+        - port: 5432
+          targetPort: 5432
+
+  # ====== Secret ====== #
+  - apiVersion: v1
+    kind: Secret
+    type: Opaque
+
+    metadata:
+      name: "${NAME}"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+    stringData:
+      db.host: "${NAME}"
+      db.port: "5432"
+      db.name: lightspeed
+      db.user: app
+      db.password: ${RHEL_CLA_DB_PASSWORD}
+
+  # ====== Deployment ====== #
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: "${NAME}"
+      labels:
+        service: rhel-cla
+        app: "${NAME}"
+
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: "${NAME}"
+
+      template:
+        metadata:
+          labels:
+            app: "${NAME}"
+
+        spec:
+          containers:
+            - name: "${NAME}"
+              image: docker.io/library/postgres:18-alpine
+              ports:
+                - containerPort: 5432
+
+              env:
+                - name: POSTGRES_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: "${NAME}"
+                      key: db.name
+
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: "${NAME}"
+                      key: db.user
+
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: "${NAME}"
+                      key: db.password
+
+              volumeMounts:
+                - name: pg-data
+                  mountPath: /var/lib/postgresql
+
+          volumes:
+            - name: pg-data
+              emptyDir: {}
+
+parameters:
+  - name: NAME
+    value: rhel-cla-db
+    required: true
+
+  - name: RHEL_CLA_DB_PASSWORD
+    generate: expression
+    from: '[a-zA-Z0-9]{32}'

@@ -10,3 +10,4 @@ __pycache__/
 /scratch/
 /inventory/*
 !/inventory/hosts.example.yml
+/openshift/params
