@@ -10,38 +10,38 @@ argument_specs:
 
       ramalama_config:
         type: dict
-        required: "{{ rhel_cla_provider == 'ramalama' }}"
+        required: &ramalama_required "{{ rhel_cla_provider == 'ramalama' }}"
         options:
           api_key:
             type: str
-            required: yes
+            required: *ramalama_required
 
           base_url:
             type: str
-            required: yes
+            required: *ramalama_required
 
           default_model:
             type: str
-            required: yes
+            required: *ramalama_required
 
       vertex_config:
         type: dict
-        required: "{{ rhel_cla_provider == 'vertex' }}"
+        required: &vertex_required "{{ rhel_cla_provider == 'vertex' }}"
         options:
           credentials_secret_name:
             type: str
-            required: yes
+            required: *vertex_required
 
           default_model:
             type: str
 
           location:
             type: str
-            required: yes
+            required: *vertex_required
 
           project_id:
             type: str
-            required: yes
+            required: *vertex_required
 
 
   k8s: *spec
