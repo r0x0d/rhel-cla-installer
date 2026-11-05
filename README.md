@@ -52,12 +52,20 @@ See the [providers documentation] for provider specific configuration. The provi
 
 1. Update the variables in `inventory/hosts.yml`, such as `okp_access_key`. Some variables depend on the external provider.
 
-1. Run the installer. If a password is required for `sudo`, add the `-K` option and enter the password when prompted.
+1. Run the installer.
 
     **Note**: Do not run the installer using `sudo`. Run it as a normal account with `sudo` privileges.
 
+    If a password is required for `sudo`, add the `-K` option and enter the password when prompted.
+
     ```
     ./rhel-cla-installer rhel.cla.local
+    ```
+
+    By default, the installer uses `/usr/bin/env python3`. If that is not Python 3.11 or later, specify the executable used to run the installer.
+
+    ```
+    python3.11 rhel-cla-installer rhel.cla.local
     ```
 
     Adjust verbosity by adding `-v`. More v's give more verbosity.
