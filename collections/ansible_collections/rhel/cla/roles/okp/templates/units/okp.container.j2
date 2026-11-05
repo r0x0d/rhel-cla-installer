@@ -9,7 +9,7 @@ Pod={{ cla_pod_name }}.pod
 
 Environment=ACCESS_KEY={{ okp_access_key }}
 Environment=SOLR_HOST_BIND={{ okp_solr_host_bind }}
-Environment=SOLR_LOG_LEVEL={{ okp_solr_log_level }}
+Environment=SOLR_LOG_LEVEL={{ okp_solr_log_level | upper }}
 
 [Service]
 Restart=on-failure

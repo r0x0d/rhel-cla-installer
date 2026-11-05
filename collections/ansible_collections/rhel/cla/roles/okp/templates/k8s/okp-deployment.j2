@@ -62,7 +62,7 @@ spec:
               value: {{ okp_solr_host_bind }}
 
             - name: SOLR_LOG_LEVEL
-              value: {{ okp_solr_log_level }}
+              value: {{ okp_solr_log_level | upper }}
 
           startupProbe:
             tcpSocket:

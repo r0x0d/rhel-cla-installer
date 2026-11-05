@@ -36,7 +36,7 @@ spec:
               value: "{{ rkb_port }}"
 
             - name: MCP_LOG_LEVEL
-              value: {{ rkb_log_level }}
+              value: {{ rkb_log_level | upper }}
 
             - name: MCP_SOLR_URL
               value: {{ rkb_solr_url }}

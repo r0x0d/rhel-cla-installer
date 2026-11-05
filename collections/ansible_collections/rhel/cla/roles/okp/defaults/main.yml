@@ -9,7 +9,7 @@ okp_cpu_request: 1
 okp_cpu_limit: 2
 okp_memory_request: 2Gi
 okp_memory_limit: 4Gi
-okp_solr_log_level: INFO
+okp_solr_log_level: "{{ rhel_cla_log_level | default('INFO') | upper }}"
 okp_access_key: ~
 okp_access_key_secret:
   name: okp

@@ -5,7 +5,7 @@ rkb_container_image_tag: v1.0.2-1785450151
 rkb_replicas: 1
 rkb_transport: streamable-http
 rkb_port: 8192
-rkb_log_level: INFO
+rkb_log_level: "{{ rhel_cla_log_level | default('INFO') }}"
 rkb_solr_url: http://{{ okp_name }}:{{ okp_port }}
 rkb_cpu_request: 250m
 rkb_cpu_limit: 1

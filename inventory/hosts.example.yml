@@ -6,6 +6,8 @@ all:
     okp_access_key: ~
     rhel_cla_provider: ~
 
+    # rhel_cla_log_level: info
+
     ## Provider specific configuration.
     ## The configuration used is based on the value of rhel_cla_provider: [rhel_cla_provider]_config.
     #

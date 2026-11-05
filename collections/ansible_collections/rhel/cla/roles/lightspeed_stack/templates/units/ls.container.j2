@@ -11,6 +11,7 @@ Exec=--config /app-root/lightspeed-stack.yml
 Secret={{ _ls_provider_config.credentials_secret_name }},target=/run/secrets/{{ _ls_provider_config.credentials_secret_name }},mode=440
 Environment=GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/{{ _ls_provider_config.credentials_secret_name }}
 {% endif %}
+Environment=LIGHTSPEED_STACK_LOG_LEVEL={{ ls_log_level | upper }}
 
 {% for file in ls_config_files %}
 Volume={{ ls_config_dir }}/{{ file | basename | replace('-' ~ _ls_major_version, '') }}:/app-root/{{ file | basename |replace('-' ~ _ls_major_version, '') }}:Z,ro
