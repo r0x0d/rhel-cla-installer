@@ -12,7 +12,7 @@ all:
     ## The configuration used is based on the value of rhel_cla_provider: [rhel_cla_provider]_config.
     #
     # vertex_config:
-    #   default_model: gemini-2.5-pro
+    #   default_model: publishers/google/models/gemini-2.5-pro
     #   credentials_secret_name: ~
     #   project_id: ~
     #   location: global
