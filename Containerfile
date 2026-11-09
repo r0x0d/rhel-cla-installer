@@ -5,7 +5,7 @@
 # s390x for gcc/libffi-devel/openssl-devel/python3-devel/rust-toolset.
 # This stage is ephemeral; only /opt/rhel-cla-installer is copied out.
 # ──────────────────────────────────────────────────────────────────────────────
-FROM registry.access.redhat.com/hi/python:3.12-builder@sha256:a50587c78debbf4e8d8cede02e29a038c6454593a9c105d4d7b8170f7aaa18b3 AS builder
+FROM registry.access.redhat.com/hi/python:3.12-builder@sha256:370dac28b556bdc990f9d04fc8d4ff5896bc5c412e49885f5e788b4c913b75f0 AS builder
 
 USER 0
 
