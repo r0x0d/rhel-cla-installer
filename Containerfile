@@ -43,7 +43,7 @@ RUN /opt/setup/build-zipapp.py
 
 
 # 2026-10-23
-FROM registry.access.redhat.com/ubi10-minimal:10.2-1792742351@sha256:ab67cd02caf8706e34a695a1432ebe965934f6128ec352a6c3f4048b43a4fb5e
+FROM registry.access.redhat.com/ubi10-minimal:10.2-1793863917@sha256:c3fe95ec9f53a3888c47314eb4d08bde09ebde646a428137b445091afe1daf89
 
 ARG VERSION=2.0.0
 
