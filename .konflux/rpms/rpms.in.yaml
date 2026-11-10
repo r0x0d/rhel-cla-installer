@@ -9,14 +9,14 @@
 
 contentOrigin:
   repos:
-    - repoid: public-hummingbird-rpms
+    - repoid: public-hummingbird-$basearch-rpms
       baseurl: https://console.redhat.com/api/pulp-content/public-hummingbird/$basearch/
     - repoid: public-hummingbird-source-rpms
       baseurl: https://console.redhat.com/api/pulp-content/public-hummingbird/source/
-    - repoid: ubi-10-baseos-rpms
+    - repoid: ubi-10-for-$basearch-baseos-rpms
       baseurl: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi10/10/$basearch/baseos/os
     # Source RPMs for the Konflux source-image build.
-    - repoid: ubi-10-baseos-source-rpms
+    - repoid: ubi-10-for-$basearch-baseos-source-rpms
       baseurl: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi10/10/$basearch/baseos/source/SRPMS
 
 packages:
