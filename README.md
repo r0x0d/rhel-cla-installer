@@ -6,7 +6,8 @@ This is the installer for the self-managed RHEL CLA. It supports local and remot
 
 Follow these instructions to get started using the RHEL CLA installer.
 
-See the [contributing] docs for information on project development and maintenance.
+See the [contributing] docs for information on project development and maintenance,
+including what to do after [base image updates].
 
 ## Prerequisites ##
 
@@ -177,6 +178,7 @@ done
 [contributing]: docs/contributing.md
 [upgrading]: docs/upgrading.md
 [providers documentation]: docs/providers.md
+[base image updates]: docs/base-image-updates.md
 [templates]: openshift/
 [token authentication]: https://github.com/lightspeed-core/lightspeed-stack/blob/main/docs/auth/api-key-token.md
 [JWK token authentication]: https://github.com/lightspeed-core/lightspeed-stack/blob/main/docs/auth/jwk-token.md

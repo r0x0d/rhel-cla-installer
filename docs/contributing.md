@@ -45,7 +45,9 @@ make rpm-lock
 
 Resolves `.konflux/rpms/rpms.in.yaml` into `.konflux/rpms/rpms.lock.yaml` with
 `rpm-lockfile-prototype` (requires `podman`). Rerun when the base image in the
-`Containerfile` or the input file changes.
+`Containerfile` or the input file changes. See
+[Base image updates](base-image-updates.md) for why this matters and how to
+verify it after a digest bump.
 
 ### Testing locally
 

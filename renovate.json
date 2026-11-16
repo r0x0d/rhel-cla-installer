@@ -28,7 +28,7 @@
       "versioning": "redhat"
     },
     {
-      "description": "Ship builder and runtime base image updates together, quickly: they usually carry CVE fixes",
+      "description": "Ship builder and runtime base image updates together, quickly: they usually carry CVE fixes. Regenerate the RPM lockfile in the same branch: its context is the builder image, so a digest bump desyncs it (see docs/base-image-updates.md)",
       "matchDepNames": [
         "registry.access.redhat.com/hi/python",
         "registry.access.redhat.com/ubi10-minimal"
@@ -37,7 +37,12 @@
       "groupName": "container base images",
       "groupSlug": "container-base-images",
       "minimumReleaseAge": "0 days",
-      "schedule": ["at any time"]
+      "schedule": ["at any time"],
+      "postUpgradeTasks": {
+        "commands": ["make rpm-lock"],
+        "fileFilters": [".konflux/rpms/rpms.lock.yaml"],
+        "executionMode": "update"
+      }
     }
   ]
 }
